@@ -1,0 +1,34 @@
+name: CI/CD Pipeline
+
+# Se dispara cuando hacemos push a develop o pull request a main
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest  # Usamos un servidor Linux de GitHub
+
+    steps:
+      # 1. Descargar tu código
+      - name: Checkout del código
+        uses: actions/checkout@v3
+
+      # 2. Configurar Docker (QEMU)
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      # 3. Configurar Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # 4. Construir la imagen (Aquí GitHub hará lo que tu PC no pudo)
+      - name: Construir imagen Docker
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false  # Por ahora solo probamos que construya, luego activamos el push
+          tags: autoparts-app:latest
